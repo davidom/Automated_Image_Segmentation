@@ -1,0 +1,36 @@
+echo "pdflatex $1"
+pdflatex $1
+if [ $? -eq 0 ]; then
+  citation=$(cat $1.aux | grep '\citation')
+  bibdata=$(cat $1.aux | grep '\bibdata')
+  bibstyle=$(cat $1.aux | grep '\bibstyle')
+  bibtexneeded=0
+  if [ -n "$citation" ]; then
+    echo "Citation: "$citation
+    bibtexneeded=1
+  fi
+  if [ -n "$bibdata" ]; then
+    echo "Bibdata: "$bibdata
+    bibtexneeded=2
+  fi
+  if [ $bibtexneeded -gt 0  ]; then
+    echo $bibtexneeded
+    echo "bibtex $1"
+    bibtex $1
+    if [ $? -eq 0 ]; then
+      echo "pdflatex $1"
+      pdflatex $1
+      if [ $? -eq 0 ]; then
+        echo "pdflatex $1"
+        pdflatex $1
+      else
+        exit $?
+      fi
+    else
+      exit $?
+    fi
+  fi
+else
+  exit $?
+fi
+open $1.pdf
