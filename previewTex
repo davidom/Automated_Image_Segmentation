@@ -1,9 +1,11 @@
-echo "pdflatex $1"
-pdflatex $1
+DOCUMENT_NAME="Document"
+
+echo "pdflatex $DOCUMENT_NAME"
+pdflatex $DOCUMENT_NAME
 if [ $? -eq 0 ]; then
-  citation=$(cat $1.aux | grep '\citation')
-  bibdata=$(cat $1.aux | grep '\bibdata')
-  bibstyle=$(cat $1.aux | grep '\bibstyle')
+  citation=$(cat $DOCUMENT_NAME.aux | grep '\citation')
+  bibdata=$(cat $DOCUMENT_NAME.aux | grep '\bibdata')
+  bibstyle=$(cat $DOCUMENT_NAME.aux | grep '\bibstyle')
   bibtexneeded=0
   if [ -n "$citation" ]; then
     echo "Citation: "$citation
@@ -15,14 +17,14 @@ if [ $? -eq 0 ]; then
   fi
   if [ $bibtexneeded -gt 0  ]; then
     echo $bibtexneeded
-    echo "bibtex $1"
-    bibtex $1
+    echo "bibtex $DOCUMENT_NAME"
+    bibtex $DOCUMENT_NAME
     if [ $? -eq 0 ]; then
-      echo "pdflatex $1"
-      pdflatex $1
+      echo "pdflatex $DOCUMENT_NAME"
+      pdflatex $DOCUMENT_NAME
       if [ $? -eq 0 ]; then
-        echo "pdflatex $1"
-        pdflatex $1
+        echo "pdflatex $DOCUMENT_NAME"
+        pdflatex $DOCUMENT_NAME
       else
         exit $?
       fi
@@ -33,4 +35,4 @@ if [ $? -eq 0 ]; then
 else
   exit $?
 fi
-open $1.pdf
+open $DOCUMENT_NAME.pdf
