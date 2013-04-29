@@ -1,6 +1,57 @@
 \section{Feature Detection}
 Introduction
 \subsection{Color}
+We first represent the color of the images in the RGB color space 
+and then detect their hue, saturation, and value, i.e., their 
+representation in the HSV color space.  Hue is what is typically
+think of as the color of the object, i.e., the object is red,
+green, purple, or etc.  Saturation is used to specify how little
+or how much there is of a color relative to its brightness.  For
+example, the color pink can range from a light pink (low saturation)
+to a dark pink (high saturation).  Value is also known as 
+brightness and represents the largest component of a color.
+
+We represent hue using a polar plot (or color circle as it was
+referred to in~\cite{preucil}).  In order to 
+compute the hue angle from the RGB representation of the color,
+first determine the relative ordering of the red, green, and blue
+components of the color.  The hue angle can then be determined from 
+use of the appropriate formula in Table~\ref{tab:hue}~\cite{preucil}.
+The range for the hue is from $0$ to $359^{o}$.
+
+\begin{table*} 
+\centering   
+\begin{tabular}{| c | c | l |}   \hline
+{\bf{Relative Ordering}} & {\bf{Color}} & {\bf{Hue Angle}} \\ \hline
+$R \geq G \geq B$ &  Red to Yellow & $h_{Preucil \ circle} = 60^{o} \cdot \frac{G-B}{R-B}$  \\ \hline
+$G > R \geq B$ & Yellow to Green & $h_{Preucil \ circle} = 60^{o} \cdot \left(1+\frac{R-B}{G-B}\right)$ \\ \hline
+$G \geq B > R$ & Green to Cyan & $h_{Preucil \ circle} = 60^{o} \cdot \left(2 + \frac{B-R}{G-R} \right)$\\ \hline
+$B > G > R$ & Cyan to Blue & $h_{Preucil \ circle} = 60^{o} \cdot \left(3 + \frac{G-R}{B-R} \right)$\\ \hline
+$B > R \geq G$ & Blue to Magenta & $h_{Preucil \ circle} = 60^{o} \cdot \left(4 + \frac{R-G}{B-G}\right)$ \\ \hline
+$R \geq B > G$ & Magenta to Red & $h_{Preucil \ circle} = 60^{o} \cdot \left(5 + \frac{B-G}{R-G}\right)$ \\ \hline
+\end{tabular}   
+\caption{Formulas used to convert RGB color into
+hue for the HSV color space~\cite{preucil}.}  
+\label{tab:hue} 
+\end{table*} 
+
+The value (or brightness) of the color is determined by computing its 
+largest component as follows: $$\max \{ R, G, B\}.$$  The range for the 
+value is between $0$ and $1$.
+
+The saturation of the color is a function of its value and its chroma (i.e,
+its colorfulness relative to the brightness of a similarly illuminated
+white).  The chroma of a color is given by $$C = 
+\sqrt{\alpha^2+\beta^2},$$
+where $$\alpha = \frac{1}{2} \left(2R-G-B\right)$$ and $$\beta = \frac{\sqrt{3}}{2} \left(G-B\right).$$
+Then, assuming the chroma has been scaled such that $C \ \in \ [0,1]$, the saturation
+for the HSV color space is given as
+$$S = \begin{cases}
+0 & \mbox{if } $C = 0$ \\
+\frac{C}{V}, & \mbox{otherwise.}
+\end{cases}
+$$ 
+
 \subsection{Structure (Texture+Noise)}
 \subsection{Geometry (Shape)}
 \subsection{Motion}
