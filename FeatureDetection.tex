@@ -55,4 +55,96 @@ $$
 % We're not doing texture and noise this time around.
 %\subsection{Structure (Texture+Noise)}
 \subsection{Geometry (Shape)}
+
 \subsection{Motion}
+In order to assess the motion in the images, we perform shape matching by 
+following the procedure in~\cite{jibum_kim_isvc_2010} which builds 
+on~\cite{felsenzwalb}.  In particular, we first create a coarse 
+constrained Delaunay triangulation of the source mesh.  Second, 
+we find the optimal mapping from the source to the target image which 
+minimizes our energy function.  This allows us to determine which shape 
+in the source image matches which shape in the target image.
+
+In order to generate a triangular mesh of the source image, we first 
+generate an optimal polygonal approximation, $P$, of the boundary curve in 
+the source image, $S$, using our optimal edge grid generator~\cite{optimal_edge_grids}.
+
+Next, we use the constrained Delauanay triangulation method~\cite{cdt_1} 
+implemented in Triangle~\cite{triangle_1} to generate a triangular mesh, 
+$M$, with boundary $P$ of $S$.  It is important to note that we do not add 
+any interior vertices when generating the constrained Delaunay 
+triangulation.  It was noted in~\cite{felsenzwalb} that such a mesh can be 
+represented using a dual graph whose vertices can be ordered and 
+eliminated using a perfect elimination scheme~\cite{perfect_1}.  
+
+Finally, we use the formulation of the optimization problem for shape 
+matching in~\cite{jibum_kim_isvc_2010}.  The shape matching problem 
+describes how to map each shape in $S$ to the corresponding shape in the 
+target image, $T$.  In particular, the solution of the optimization 
+problem prescribes where to place the boundary vertices of $M$ onto the 
+corresponding shape in $T$.
+
+Briefly, the energy function for shape matching 
+in~\cite{jibum_kim_isvc_2010} consists of three terms:  an edge cost, a 
+triangular deformation cost, and a triangular edge length distortion cost.
+
+The edge cost for the $i^{th}$ triangle, $E_{edge,i}$, acts as an edge 
+detector and  is given by 
+$$
+E_{edge,i}=\frac{1}{\lambda +\left |  \triangledown I \right |},
+$$
+where $\lambda$ is a constant.
+
+The triangular deformation cost, $E_{def,i}$, measures how far the 
+original triangle is transformed from a similarity 
+transformation~\cite{widrow_1}.  The triangular deformation cost
+is given by
+$$
+E_{def,i}=log^{2}\left ( \frac{\alpha }{\beta } \right ),
+$$
+where $\alpha$ and $\beta$ are the singular values of the matrix 
+associated with an affine transformation which maps a triangle from $S$ to 
+a triangle in $T$.  
+
+Finally, the triangular edge length distortion cost, $E_{dis,i}$, is a 
+term which penalizes distortions of the edge lengths of a triangle.  Let
+$l_{sum,s}$ and $l_{sum_t}$ bet the sums of the edge lengths of a triangle 
+in $S$ and $T$, respectively.  Now, define $\gamma$ as 
+$$
+\gamma =\left\{\begin{matrix}
+l_{sum, s}/l_{sum, t} \  \ \mathrm{if} \   l_{sum, s} >   l_{sum, t} \\
+l_{sum, t}/l_{sum. s} \  \ \mathrm{if} \   l_{sum, t} >  l_{sum, s}.
+\end{matrix}\right.
+$$
+
+We also use the center of mass in the image to make the triangular edge 
+length distortion cost invariant under uniform scaling of the source image 
+to the target image.  Define $d_{max, s}$ and $d_{max, t}$ to be the 
+maximum distances from the center of masses to the boundary vertices in 
+$S$ and $T$, respectively.
+
+Now, define $\delta$ as follows
+$$
+\delta =\left\{\begin{matrix}
+d_{max,s} / d_{max,t} \ \ \mathrm{if} \ \ d_{max,s} > d_{max,t}\\
+d_{max,t} / d_{max,t} \ \ \mathrm{if} \ \ d_{max,s} < d_{max,t}.
+\end{matrix}\right.
+$$
+
+Finally, $E_{dis, i}$ is defined as follows:
+$$
+E_{dis,i}=\left\{\begin{matrix}
+log(\gamma / \delta ) \ \ \mathrm{if} \ \ \gamma > \delta \\
+log(\delta / \gamma ) \ \ \mathrm{if} \ \ \gamma < \delta.
+\end{matrix}\right.
+$$
+
+{\bf{Suzanne:  This is a place holder for now.  Eventually this will be 
+combined with the formulation of one large optimization problem for 
+color, geometry, and motion.}}
+
+The energy function, $E(f)$, for shape matching is given by
+\begin{equation}
+E(f)=\sum_{i=1}^{N}E_{i}=\sum_{i=1}^{N}(E_{edge,i}+a*E_{def,i}+b*E_{dis,i}),
+\end{equation} 
+where $N$ is the number of triangles in $M$ and $a$ and $b$ are scalars. 
