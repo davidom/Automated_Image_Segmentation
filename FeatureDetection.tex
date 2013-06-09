@@ -55,6 +55,36 @@ $$
 % We're not doing texture and noise this time around.
 %\subsection{Structure (Texture+Noise)}
 \subsection{Geometry (Shape)}
+Similar to our work in~\cite{hydrocephalus2,hydrocephalus1}, We use 
+the Chan and Vese level set method~\cite{chan_vese} in order to determine 
+the geometry of shapes in an image.  This level set method evolves let 
+set curves using minimiation of a Mumford-Shah type energy functional.
+
+As in~\cite{hydrocephalus1}, let $u_0$ denote an image on domain $\Omega$,
+and let $C$ be a parametrized curve.  Let $\phi$ be an implicit representation
+of $C$ and a Lipschitz function.  Then, the zero-level curve of $\phi(t,x,y)$
+at time $t$ is used to evolve the curve $C$ based on a prescribed speed
+and direction.
+
+The evolution of the curve is obtained my minimizing the following
+regularized energy functional:
+\begin{eqnarray}
+\begin{array}{rcl}
+F_{\epsilon}(c_1,c_2,\phi) & = & \mu \int_{\Omega} \delta_{\epsilon}(\phi(x,y))|\nabla \phi(x,y)| \
+dx \ dy \\
+ & & + \nu \int_{\Omega} H_{\epsilon}(\phi(x,y)) \ dx \ dy \\
+ & & + \lambda_1 \int_{\Omega} |u_0(x,y)-c_1|^2 \ H_{\epsilon} (\phi(x,y)) \ dx \ dy \\
+ & & + \lambda_2 \int_{\Omega} |u_0(x,y)-c_2|^2 \ (1-H_{\epsilon}(\phi(x,y))) \ dx \ dy,
+\end{array}
+\label{eq:energy}
+\end{eqnarray}
+where $c_1$ and $c_2$ are constants which depend on $C$ and denote the averages of
+$u_0$ on the inside and outside of $C$.  In addition, $\mu \geq 0, \nu \geq 0,
+\lambda_1$, and $\lambda_2$ are constants, and $H_{\epsilon}$, $\delta_{\epsilon}$
+are regularization parameters.
+
+We minimize (\ref{eq:energy}) using a C++ implementation of Wu's 
+Matlab code in~\cite{wu2011}.  See~\cite{chan_vese} for more details.
 
 \subsection{Motion}
 In order to assess the motion in the images, we perform shape matching by 
